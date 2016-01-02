@@ -1,0 +1,160 @@
+%  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .%
+%:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::%
+%'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'  %
+%                              ____  ____  ____ 			  %
+%			      / __ )/ __ )/ __ )			  %
+%			     / __  / __  / __  |			  %
+%			    / /_/ / /_/ / /_/ /				  % 
+%			   /_____/_____/_____/        			  %
+%'      .--.      .'-.      .--.      .--.      .--.      .-'.      .--.  %
+%:::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::%
+%  `--'      `-.'      `--'      `--'      `--'      `--'      `.-'      `%
+
+%=========================================================================%
+%                             Useful Commands                             %
+%=========================================================================% 
+
+This is the general way to ssh into the BBB
+>> ssh drz@192.168.7.2
+
+If you wish to change network settings, these are the files
+>> sudo nano /etc/network/interfaces
+>> sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+
+Useful to grab network data
+>> sudo ifconfig
+
+Git Commands
+>> git init
+>> git config --global user.name "kat284"
+>> git config --global user.email scokie@rocketmail.com
+>> git clone https://github.com/kat284/nexus_project.git
+>> git add 'Filename.txt' or git add *
+>> git commit -m 'Text Here'
+>> git push
+>> git pull
+
+
+%=========================================================================%
+%                         Full Installation Guide                         %
+%=========================================================================% 
+
+
+%-------------------------------------------------------------------------%
+%                              SD Card Image                              %
+%-------------------------------------------------------------------------%
+
+Luckily for the BBB, imaging is the easiest way to install Ubuntu (which is what we are installing). Specifically, we are using Debian (wheezy) as it has offical support and because of the Pi also having the same distro.
+
+First, we will need to get the actual image file. If it's not on the computer, it can be obtained from the following site or from the command.
+	http://beagleboard.org/latest-images
+>> wget http://debian.beagleboard.org/images/BBB-eMMC-flasher-debian-7.5-2014-05-14-2gb.img.xz
+
+We then need to verify it downloaded correctly as to avoid issues later.
+>> md5sum BBB-eMMC-flasher-debian-7.5-2014-05-14-2gb*
+- The output for the above img should be the following. If it's not, re-download.
+	 74615fb680af8f252c034d3807c9b4ae  BBB-eMMC-flasher-debian-7.5-2014-05-14-2gb.img.xz
+
+Lastly, we just get the image and clone it onto the SD card. This can take 20 mins or more.
+>> unxz BBB-eMMC-flasher-debian-7.5-2014-05-14-2gb.img.xz
+sudo dd if=./BBB-eMMC-flasher-debian-7.5-2014-05-14-2gb.img of=/dev/mmcblk0
+- If you want an update on how the progress on the dd command is going, typing the following in another terminal will update the previous terminal every 10 seconds.
+>> watch -n10 'sudo kill -USR1 $(pgrep ^dd)'
+
+%-------------------------------------------------------------------------%
+%                               eMMC Flash                                %
+%-------------------------------------------------------------------------%
+This part is currently not important as we aren't flashing but the process is very easy and is faster for the BBB. The image we are using is too big to put onto the BBB without filling up the eMMC. For reference, this is what you would do after doing the above with a flasher image.
+-For writing onto the eMMC of the BBB,make sure the BBB is not powered and then insert the SD card and hold the boot select button down (next to the where the card is inserted). Once it's held down, apply power and release the button.
+-If it's successful in booting up, the LEDs should start a flashing procedure visually via a Cylon Sweep pattern. Once this stops and all LEDs are full on, remove power, the SD card and reboot.
+
+%-------------------------------------------------------------------------%
+%                               BBB Setup                                 %
+%-------------------------------------------------------------------------%
+
+At this point, connect the BBB to the computer via USB and connect the power to a wall outlet. Use the following to log in.
+>> ssh debian@192.168.7.2
+- If asked about a RSA key or a ssh key, say "yes."
+username: debian
+password: temppwd
+
+The hostname or the name of the BBB will need to be changed from "beaglebone" to "BBB".
+>> sudo nano /etc/hostname
+>> sudo nano /etc/hosts
+
+Change the file to match what is below.
+%\-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=/%
+127.0.0.1       localhost
+127.0.1.1       BBB.localdomain BBB
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+%/-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\%
+Click Ctrl+X, then y then Enter to save and exit when done.
+
+We next need to disable the HDMI.
+>> sudo nano /boot/uEnv.txt
+
+Now we need to setup WiFi on the BBB. Luckily this is pretty much like the Pi. Make sure to edit the file to be the same as below.
+>> sudo nano /etc/network/interfaces
+%\-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=/%
+auto lo
+iface lo inet loopback
+
+#auto eth0
+#iface eth0 inet dhcp
+
+auto wlan0
+iface wlan0 inet dhcp
+    wpa-driver wext
+    wpa-ssid "Moto-Wifi"
+    wpa-psk  "zaq12wsx!"
+
+# Ethernet/RNDIS gadget (g_ether)
+# Used by: /opt/scripts/boot/autoconfigure_usb0.sh
+iface usb0 inet static
+    address 192.168.7.2
+    netmask 255.255.255.252
+    network 192.168.7.0
+    gateway 192.168.7.1
+%/-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\%
+Click Ctrl+X, then y then Enter to save and exit once complete.
+
+We can now ssh into the BBB using wifi. We should also change the password to something a bit easier to rembmer aswell.
+- Change the password to "zaq12wsx"
+>> sudo passwd debian
+sudo reboot
+
+
+
+
+
+
+Now we will need to expand the OS to be able to use the entire SD card for memory.
+>> cd /opt/scripts/ 
+git pull 
+./tools/grow_partition.sh 
+sudo reboot
+
+The Pi has one advantage over in BBB in the case of processing. The BBB, being low in processing, was also not given much RAM to work with. This will slow it down greatly and also limit what can be done on the BBB. To fix this, we will be using swap. Swap creates a file to "use" as RAM at the cost of lowering the lifetime of whatever is holding the memory. This disadvantage isn't too much an issue to us as the lowered lifetime will give us more use of the device in the long run. To create 1GB of swap, do the following.
+
+>> sudo mkdir -p /var/cache/swap/   
+sudo dd if=/dev/zero of=/var/cache/swap/swapfile bs=1M count=1024
+sudo chmod 0600 /var/cache/swap/swapfile 
+sudo mkswap /var/cache/swap/swapfile 
+sudo swapon /var/cache/swap/swapfile 
+
+We also will need to load the swapfile on startup by adding the following line into the file.
+	/var/cache/swap/swapfile    none    swap    sw    0   0
+>> sudo nano /etc/fstab
+
+Test the swapfile with the following
+>> top
+- KiB Swap should be about 1GB
+
+
+
+
