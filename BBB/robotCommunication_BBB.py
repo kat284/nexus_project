@@ -6,75 +6,47 @@
 #:::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::%
 #  `--'      `-.'      `--'      `--'      `--'      `--'      `.-'      `%
 #File type:                Nexus Project Python Function File
-#File name:                robotControl (robotControl_BBB.py)
-#Description:              Robot control file for the BBB. Uses the Khan chassis and BBB Khan cape.
-#Inputs/Resources:         N/A
+#File name:                robotCommunication (robotCommunication_BBB.py)
+#Description:              Robot communication file for the BBB. Uses the Khan chassis and BBB Khan cape.
+#Inputs/Resources:         pyserial
 #Output/Created files:     N/A
 #Written by:               Keith Tiemann
-#Created:                  1/3/2016
+#Created:                  12/28/2015
 #Last modified:            1/3/2016
 #Version:                  1.0.0
 #Example usage:            N/A
-#Notes:  
-#	Code Abbreviations                  
-#		cleanupPins()			=	["cP","1"]
-#		rM.leftTrack(speed)	=	["lT"," "]
-#		rM.rightTrack(speed)	=	["rT"," "]
-#		rM.move(speed)			=	["m" ," "]
-#		rM.pointTurn(speed)	=	["pT"," "]
+#Notes:  						N/A
 #=========================================================================%
 #                                 Imports                                 %
 #=========================================================================% 
-import Adafruit_BBIO.GPIO as GPIO
-import Adafruit_BBIO.PWM as PWM
 import Adafruit_BBIO.UART as UART
-import robotMovement_BBB as rM
-import robotCommunication_BBB as rC
 import time
 #=========================================================================%
 #                                Functions                                %
 #=========================================================================% 
 def setupPins():
-	rC.setupPins()
-	rM.setupPins()
-
+	UART.setup("UART5")
+	port = serial.Serial(port = "/dev/ttyO5", baudrate=9600)
+	port.close()
+	port.open()
 def cleanupPins():
-	rC.cleanupPins()
-	rM.cleanupPins()
-
-def runCode():
-	if ((list(0) == "cP") && (list(1) == "1")):
-		cleanupPins():
-		return -1
-	elif list(0) == "lT":
-		rM.leftTrack(speed)
-		return 1
-	elif list(0) == "rT":
-		rM.leftTrack(speed)
-		return 1
-	elif list(0) == "m":
-		rM.move(speed)
-		return 1
-	elif list(0) == "pT":
-		rM.pointTurn(speed)
-		return 1
-	else:
-		return 0
-
-def listen():
-	code = [ "00" , '0']
-	while code == ['NA', '0']
-		code = rC.receiveCode()
-	status = runCode(code)
-	if status == -1:
-		rC.sendCode("-1")
-		return -1
-	if status == 1:
-		rC.sendCode("1")
-		return 1
-	else:
-		rC.sendCode("0")
-		return 0
+	port.close()
+	PWM.cleanup()	
+	GPIO.cleanup()
+def receiveCode():
+	try:
+		string = port.read()         
+	   time.sleep(0.1)         
+	   remaining_bytes = port.inWaiting() 
+	   string += port.read(remaining_bytes)
+		list = string.split('._.')
+	   return list
+	except:
+	   return ['NA', '0']
+def sendCode(string):
+	if port.isOpen():
+    	 port.write(string)
+	    time.sleep(0.1)	
 
 #  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .%
 #:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::%
