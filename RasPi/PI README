@@ -1,11 +1,11 @@
 %  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .%
 %:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::%
 %'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'  %
-%                           ____             ____  _ 			  %
-%			   / __ \____ ______/ __ \(_)			  %
-% 			  / /_/ / __ `/ ___/ /_/ / / 			  %	
-%			 / _, _/ /_/ (__  ) ____/ /  			  %
-%			/_/ |_|\__,_/____/_/   /_/   			  %
+%                           ____             ____  _ 							  %
+%								   / __ \____ ______/ __ \(_)			  				  %
+% 			 					  / /_/ / __ `/ ___/ /_/ / / 			  				  %	
+%			 					 / _, _/ /_/ (__  ) ____/ /  			  				  %
+%								/_/ |_|\__,_/____/_/   /_/   			  				  %
 %'      .--.      .'-.      .--.      .--.      .--.      .-'.      .--.  %
 %:::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::::'/::::::%
 %  `--'      `-.'      `--'      `--'      `--'      `--'      `.-'      `%
@@ -53,7 +53,7 @@ The Pi, if the guide was used, should be setup already to be able to use UART so
 
 First off a simple warning, THE PI IS A 3.3V SYSTEM! That means if you want to connect it to an Arduino UNO (5V), you need a voltage regulator of some kind or a voltage leveler. If you don't, YOU CAN CAUSE DAMAGE TO BOTH DEVICES! This warning is not of importance for connecting two Pi's or to a Arduino Mini Pro (3.3V), as they are at the same voltage. The Beaglebone Black is also another device that can connect to the Pi without a regulator while the VEX Cortex is NOT!
 
-Now that that is out of the way, to connect anything with UART you will need three cables to connect the GNDs, TX and RX lines. The TX line of one device goes to the RX line of the other and vice-visa. At point, you just use communication code like TransmitterUART.py and EmitterUART.py.
+Now that that is out of the way, to connect anything with UART you will need three cables to connect the GNDs, TX and RX lines. The TX line of one device goes to the RX line of the other and vice-visa. At this point, you just use communication code like TransmitterUART.py and EmitterUART.py.
 
 %=========================================================================%
 %                         Full Installation Guide                         %
