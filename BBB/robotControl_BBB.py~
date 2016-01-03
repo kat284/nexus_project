@@ -7,7 +7,7 @@
 #  `--'      `-.'      `--'      `--'      `--'      `--'      `.-'      `%
 #File type:                Nexus Project Python Function File
 #File name:                robotControl (robotControl_BBB.py)
-#Description:              Robot control file for the BBB. Uses the Khan chassis and BBB Khan cape.
+#Description:              Robot control file for the BBB. Uses the Khan chassis and BBB Khan cape. Does actions based on UART feedback.
 #Inputs/Resources:         N/A
 #Output/Created files:     N/A
 #Written by:               Keith Tiemann
@@ -42,7 +42,7 @@ def cleanupPins():
 	rC.cleanupPins()
 	rM.cleanupPins()
 
-def runCode():
+def runCode(list):
 	if ((list(0) == "cP") && (list(1) == "1")):
 		cleanupPins():
 		return -1

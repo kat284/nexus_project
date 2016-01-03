@@ -27,6 +27,7 @@ import time
 #                                  Script                                 %
 #=========================================================================% 
 status = 0
+rC.setupPins()
 while(status != -1)
 	status = listen()
 	
